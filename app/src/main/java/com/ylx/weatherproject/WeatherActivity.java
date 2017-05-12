@@ -7,11 +7,13 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.ylx.weatherproject.gson.Forecast;
 import com.ylx.weatherproject.gson.Weather;
 import com.ylx.weatherproject.util.HttpUtil;
@@ -27,6 +29,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     private ScrollView weatherLayout;
     private LinearLayout forecastLayout;
+    private ImageView bingPicImg;
     private TextView changeCity,titleCity, titleUpdateTime, degreeText, weatherInfoText, aqiText, pm25Text, comfortText, carWashText, sportText;
 
     private SharedPreferences prefs;
@@ -46,6 +49,7 @@ public class WeatherActivity extends AppCompatActivity {
     private void initView() {
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
+        bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
         changeCity = (TextView) findViewById(R.id.change_city);
         titleCity = (TextView) findViewById(R.id.title_city);
         titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
@@ -75,6 +79,40 @@ public class WeatherActivity extends AppCompatActivity {
             public void onClick(View v) {
                 startActivity(new Intent(WeatherActivity.this, MainActivity.class));
                 finish();
+            }
+        });
+
+        String bingPic = prefs.getString("bing_pic",null);
+        if(bingPic != null){
+            Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+        } else {
+            loadBingPic();
+        }
+    }
+
+    /**
+     * 加载必应每日一图
+     */
+    private void loadBingPic(){
+        String requestBingPic = WEATHER_URL + "bing_pic";
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                final String picUrl = response.body().string();
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                editor.putString("bing_pic",picUrl);
+                editor.apply();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Glide.with(WeatherActivity.this).load(picUrl).into(bingPicImg);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(WeatherActivity.this, "必应每日一图加载失败", Toast.LENGTH_SHORT).show();
             }
         });
     }
