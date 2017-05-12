@@ -1,11 +1,12 @@
 package com.ylx.weatherproject;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -35,7 +36,9 @@ public class WeatherActivity extends AppCompatActivity {
     private ImageView bingPicImg;
     private TextView changeCity,titleCity, titleUpdateTime, degreeText, weatherInfoText, aqiText, pm25Text, comfortText, carWashText, sportText;
 
-    private SwipeRefreshLayout swipRefresh;
+    public SwipeRefreshLayout swipRefresh;
+
+    public DrawerLayout drawerLayout;
 
     private SharedPreferences prefs;
 
@@ -64,6 +67,7 @@ public class WeatherActivity extends AppCompatActivity {
      * 初始化各控件
      */
     private void initView() {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         swipRefresh = (SwipeRefreshLayout) findViewById(R.id.swip_refresh);
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
@@ -118,8 +122,7 @@ public class WeatherActivity extends AppCompatActivity {
         changeCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(WeatherActivity.this, MainActivity.class));
-                finish();
+                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
 
@@ -166,7 +169,7 @@ public class WeatherActivity extends AppCompatActivity {
      * 根据天气id，查询城市天气信息
      * @param weatherId
      */
-    private void requestWeather(String weatherId) {
+    public void requestWeather(String weatherId) {
         String weatherUrl = WEATHER_URL + "weather?cityid=" + weatherId + "&key=ef10ef1548ca42eebec46901ee2c49b8";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
