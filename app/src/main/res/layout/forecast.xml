@@ -7,11 +7,12 @@
     android:background="#8000">
 
     <TextView
+        android:id="@+id/notification_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:text="预报"
+        android:text="预报(点击可看到通知)"
         android:textColor="#fff"
         android:textSize="20sp"
         />

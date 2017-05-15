@@ -1,11 +1,16 @@
 package com.ylx.weatherproject;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -36,7 +41,7 @@ public class WeatherActivity extends AppCompatActivity {
     private ScrollView weatherLayout;
     private LinearLayout forecastLayout;
     private ImageView bingPicImg;
-    private TextView changeCity,titleCity, titleUpdateTime, degreeText, weatherInfoText, aqiText, pm25Text, comfortText, carWashText, sportText;
+    private TextView changeCity,titleCity, titleUpdateTime, degreeText, weatherInfoText, aqiText, pm25Text, comfortText, carWashText, sportText,notification_text;
 
     public SwipeRefreshLayout swipRefresh;
 
@@ -84,6 +89,7 @@ public class WeatherActivity extends AppCompatActivity {
         comfortText = (TextView) findViewById(R.id.comfort_text);
         carWashText = (TextView) findViewById(R.id.car_wash_text);
         sportText = (TextView) findViewById(R.id.sport_text);
+        notification_text = (TextView) findViewById(R.id.notification_text);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather",null);
@@ -137,6 +143,42 @@ public class WeatherActivity extends AppCompatActivity {
                 requestWeather(main_weatherId);
             }
         });
+
+        /**
+         * notification_text 点击可看到通知栏通知
+         */
+        notification_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                crateNotification();
+            }
+        });
+    }
+
+    /**
+     * 创建系统通知栏消息
+     */
+    private void crateNotification(){
+        Intent intent = new Intent(WeatherActivity.this, NotificationActivity.class);
+        PendingIntent pIndent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Notification notification = new NotificationCompat.Builder(WeatherActivity.this)
+                .setContentTitle("Windows勒索病毒席卷全球")
+                .setContentText("Windows勒索病毒席卷全球：但这个国家成功躲过")
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.logo)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.logo))
+                .setContentIntent(pIndent)
+                .setAutoCancel(true)
+                .build();
+        manager.notify(1, notification);
+
+        /**
+         * 通知栏点击之后让其消失，有两种方法。
+         *  1、在notification再掉一个.setAutoCancel(true)方法，当参数值为true时，则说明点击之后自动消失;
+         *  2、调用mannger.cancle(1)方法，此参数要和notify(1, notification)方法总第一个参数值保持一致;
+         */
     }
 
 
